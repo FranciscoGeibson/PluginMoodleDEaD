@@ -1,2 +1,2 @@
 <?php
-$string['pluginname'] = 'Visão Geral das Notas';
+$string['pluginname'] = 'Notas para SIGAA';

@@ -21,7 +21,7 @@ class block_gradeoverview extends block_base
         $this->content->text = '';
 
         // Gera o link para o download do CSV
-        $url = new moodle_url('/blocks/block_gradeoverview/download_grades.php', array('courseid' => $COURSE->id));
+        $url = new moodle_url('/blocks/gradeoverview/download_grades.php', array('courseid' => $COURSE->id));
         $this->content->text .= html_writer::link($url, 'Baixar Planilha de Notas', array('class' => 'btn btn-primary'));
         $this->content->text .= html_writer::link('https://dead.uern.br', 'Ver tutorial de utilização', array('class' => 'btn btn-secondary'));
 

@@ -21,7 +21,7 @@ O **Visão Geral das Notas** é um plugin desenvolvido para a plataforma Moodle 
 - **Exportação para XLS**  
   Gera um link que permite o download de uma planilha em formato XLS, contendo os nomes dos alunos e suas respectivas notas finais.  
 
-## 🛠 Estrutura do Código  
+## Estrutura do Código  
 
 - `block_gradeoverview.php`  
   Contém a lógica principal do bloco, incluindo a consulta às notas dos alunos.  

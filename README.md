@@ -1,19 +1,30 @@
-# Plugin Moodle - Visão Geral das Notas
+# Plugin Moodle - Visão Geral das Notas  
 
-## Descrição
+##  Melhorias Planejadas  
 
-Este plugin para Moodle, denominado **Visão Geral das Notas**, foi desenvolvido para proporcionar uma visualização simplificada das notas dos alunos em um curso específico. O objetivo é facilitar o acesso e a análise das notas, permitindo que educadores e administradores visualizem rapidamente o desempenho dos alunos.
+- **Reconhecimento Dinâmico**  
+  Adicionar o reconhecimento automático do nome breve do curso e da carga horária diretamente no código.  
 
-## Funcionalidades Atuais
+- **Inclusão de Colunas**  
+  Adicionar a coluna "Recuperação" no arquivo XLS gerado.  
 
-- **Visualização das Notas**: O plugin permite que os usuários com permissões vejam as notas finais de todos os alunos em um curso específico diretamente na interface do Moodle.
-- **Download de Planilha**: Uma funcionalidade que gera um link para download de uma planilha em formato CSV contendo os nomes dos alunos e suas respectivas notas finais.
+- **Automatização de Notas**  
+  Integrar o sistema para reconhecer automaticamente as notas dos alunos, utilizando as funcionalidades da API do Moodle, sem necessidade de cálculos manuais no código.  
 
-## Desenvolvimento
+O **Visão Geral das Notas** é um plugin desenvolvido para a plataforma Moodle que facilita a visualização e exportação das notas dos alunos de um curso específico. Ele foi criado para oferecer uma experiência mais prática e eficiente para educadores e administradores, permitindo a análise rápida do desempenho acadêmico.  
 
-Este plugin está atualmente na fase inicial de desenvolvimento. As funcionalidades podem ser aprimoradas e novas features podem ser adicionadas conforme o projeto avança. O desenvolvimento está aberto a colaborações e sugestões.
-Estrutura do Código
+##  Funcionalidades  
 
-    block_gradeoverview.php: Contém a lógica principal do bloco, incluindo a consulta às notas dos alunos.
-    download_grades.php: Gera a planilha CSV com as notas dos alunos para download.
+- **Visualização Dinâmica**  
+  Permite a visualização das notas finais de todos os alunos diretamente na interface do Moodle, com suporte a cursos específicos.  
 
+- **Exportação para XLS**  
+  Gera um link que permite o download de uma planilha em formato XLS, contendo os nomes dos alunos e suas respectivas notas finais.  
+
+## 🛠 Estrutura do Código  
+
+- `block_gradeoverview.php`  
+  Contém a lógica principal do bloco, incluindo a consulta às notas dos alunos.  
+
+- `download_grades.php`  
+  Gera a planilha XLS com as notas dos alunos para download.  

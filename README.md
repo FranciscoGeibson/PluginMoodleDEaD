@@ -3,7 +3,7 @@
 ##  Melhorias Planejadas  
 
 - **Reconhecimento Dinâmico**  
-  Adicionar o reconhecimento automático do nome breve do curso e da carga horária diretamente no código.  
+  Adicionar o reconhecimento automático da carga horária diretamente no código.  
 
 - **Inclusão de Colunas**  
   Adicionar a coluna "Recuperação" no arquivo XLS gerado.  

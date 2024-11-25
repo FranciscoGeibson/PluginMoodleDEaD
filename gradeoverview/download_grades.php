@@ -31,7 +31,6 @@ function get_student_grade($studentId, $itemId) {
 // Função para obter as faltas de um aluno
 function get_student_absences($studentId) {
     global $DB;
-    // Aqui é assumido que as faltas são armazenadas em um campo personalizado 'faltas'
     $profile = $DB->get_record('user_info_data', ['userid' => $studentId, 'fieldid' => 1]); // Ajuste o campo ID conforme necessário
     return $profile ? $profile->data : 0; // Retorna o número de faltas ou 0 se não encontrado
 }
@@ -57,10 +56,13 @@ try {
     $course_hours = 150; // Substitua com a duração real do curso
     $allowed_absences = $course_hours * 0.25;
 
+    // Verifica se o campo idnumber está preenchido (turma)
+    $course_turma = !empty($course->idnumber) ? $course->idnumber : "Turma não definida";
+
     // Cabeçalho de informações
     echo '<table border="1">';
     echo '<tr><td colspan="8"><strong>PLANILHA DE NOTAS</strong></td></tr>';
-    echo '<tr><td colspan="8">' . htmlspecialchars($course->fullname) . ' </td></tr>';  // Nome do curso
+    echo '<tr><td colspan="8">' . htmlspecialchars($course->shortname) . ' - ' . htmlspecialchars($course->fullname) . ' - Turma ' . htmlspecialchars($course_turma) . '</td></tr>';
     echo '<tr><td colspan="8">Digite as notas das unidades utilizando vírgula para separar a casa decimal.</td></tr>';
     echo '<tr><td colspan="8">O campo faltas deve ser preenchido com o número de faltas do aluno durante o período letivo.</td></tr>';
     echo '<tr><td colspan="8">A situação do aluno em relação a assiduidade é calculada apenas levando em consideração a carga horária da disciplina.</td></tr>';

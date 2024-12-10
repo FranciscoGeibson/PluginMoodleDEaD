@@ -6,7 +6,7 @@ $courseid = required_param('courseid', PARAM_INT);
 $course = $DB->get_record("course", ['id' => $courseid]);
 
 $context = context_course::instance($courseid);
-require_capability('moodle/grade:viewall', $context);
+require_capability('block/gradeoverview:view', $context);
 
 global $DB;
 

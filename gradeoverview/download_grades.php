@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style;
 
 require_login();
 
@@ -29,7 +30,9 @@ function get_category_id_by_name($category_name, $courseid) {
 function get_student_grade($studentId, $itemId) {
     global $DB;
     $grade = $DB->get_record('grade_grades', ['itemid' => $itemId, 'userid' => $studentId]);
-    return $grade ? number_format($grade->finalgrade, 2, ',', '') : null;
+    //return $grade ? number_format($grade->finalgrade, 1, ',', '') : null;
+    return $grade ? round($grade->finalgrade, 1) : null; // Retorna um valor numérico arredondado
+
 }
 
 // Função para obter a matrícula do aluno a partir de um campo personalizado
@@ -135,7 +138,7 @@ $intro_text = [
     [''],
     ['Digite as notas das unidades utilizando vírgula para separar a casa decimal.'],
     ['O campo faltas deve ser preenchido com o número de faltas do aluno durante o período letivo.'],
-    ['A situação do aluno em relação à assiduidade é calculada apenas levando em consideração a carga horária da disciplina.'],
+    ['A situação do aluno em relação a assiduidade é calculada apenas levando em consideração a carga horária da disciplina.'],
     ['Devido a isso a situação pode mudar durante a importação da planilha.'],
     ['As notas das unidades não vão para o histórico do aluno, no entanto, aparecem em seu portal.'],
     ['Altere somente as células em amarelo.'],
@@ -148,6 +151,18 @@ $start_column = 'B';
 $end_column = 'J'; // Define o alcance horizontal da tabela
 foreach ($intro_text as $line) {
     $sheet->fromArray($line, null, "{$start_column}{$row}");
+
+
+    // Adicionar bordas ao redor da tabela de introdução
+    /*$table_range = "{$start_column}1:{$end_column}" . ($row - 1); // Determina o intervalo da tabela
+    $sheet->getStyle($table_range)->applyFromArray([
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color' => ['argb' => 'FF000000'], // Preto
+            ],
+        ],
+    ]);*/
 
 
     // Mesclar as células da linha inteira
@@ -198,6 +213,10 @@ $unit1_category_id = get_category_id_by_name('Unidade 1', $courseid);
 $unit2_category_id = get_category_id_by_name('Unidade 2', $courseid);
 $unit3_category_id = get_category_id_by_name('Unidade 3', $courseid);
 
+
+
+$absences = 0;
+
 foreach ($students as $student) {
     $fullname = strtoupper($student->firstname . ' ' . $student->lastname);
     //$username = $student->username;
@@ -215,13 +234,13 @@ foreach ($students as $student) {
     $grade2 = get_student_grade($student->id, $unit2_category_id);
     $grade3 = get_student_grade($student->id, $unit3_category_id);
 
-    $grade1 = $grade1 !== null ? str_replace('.', ',', $grade1) : '';
-    $grade2 = $grade2 !== null ? str_replace('.', ',', $grade2) : '';
-    $grade3 = $grade3 !== null ? str_replace('.', ',', $grade3) : '';
+    //$grade1 = $grade1 !== null ? str_replace('.', ',', $grade1) : '';
+    //$grade2 = $grade2 !== null ? str_replace('.', ',', $grade2) : '';
+    //$grade3 = $grade3 !== null ? str_replace('.', ',', $grade3) : '';
 
-    $result_formula = <<<EOD
-    =SE(OU(D$row="-"; D$row=""; E$row="-"; E$row=""; F$row="-"; F$row=""); "-"; SE(OU(G$row=""; G$row<0; G$row="-"); (ARRED((((D$row*4*10)+(E$row*5*10)+(F$row*6*10))/150)*10; 0)/10); (ARRED(((SE(MÍNIMO(D$row; E$row; F$row)=D$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(D$row*6*10)+(G$row*6*10); SE(MÍNIMO(D$row; E$row; F$row)=E$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(E$row*6*10)+(G$row*6*10); SE(MÍNIMO(D$row; E$row; F$row)=F$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(F$row*6*10)+(G$row*6*10); ))))/150)*10; 0)/10)))
-    EOD;
+    //$result_formula = <<<EOD
+    //=SE(OU(D$row="-"; D$row=""; E$row="-"; E$row=""; F$row="-"; F$row=""); "-"; SE(OU(G$row=""; G$row<0; G$row="-"); (ARRED((((D$row*4*10)+(E$row*5*10)+(F$row*6*10))/150)*10; 0)/10); (ARRED(((SE(MÍNIMO(D$row; E$row; F$row)=D$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(D$row*6*10)+(G$row*6*10); SE(MÍNIMO(D$row; E$row; F$row)=E$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(E$row*6*10)+(G$row*6*10); SE(MÍNIMO(D$row; E$row; F$row)=F$row; (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(F$row*6*10)+(G$row*6*10); ))))/150)*10; 0)/10)))
+    //EOD;
 
 
     //$status_formula = "IF(OR(H{$row}="-", H{$row}=""), "-", IF(I{$row}>15, IF(H{$row}>=6, IF(OR(D{$row}<7, E{$row}<7, F{$row}<7), "RENF", "REPF"), "REMF"), IF(H{$row}>=7, "APR", IF(H{$row}>=6, IF(AND(OR(D{$row}<7, E{$row}<7, F{$row}<7), OR(G{$row}="-", G{$row}="")), "REC", IF(OR(G{$row}="-", G{$row}=""), IF(H{$row}>=7, "APR", "APRN"), IF(G{$row}>=7, "APR", "REPN"))), IF(H{$row}>=7, IF(OR(G{$row}="-", G{$row}=""), "REC", "REP"), "REP")))))";
@@ -238,8 +257,9 @@ foreach ($students as $student) {
     //$result_formula = "=IF(OR(D$row="-", D$row="", E$row="-", E$row="", F$row="-", F$row=""), "-", IF(OR(G$row="", G$row<0, G$row="-"), ROUND((((D$row*4*10)+(E$row*5*10)+(F$row*6*10))/150)*10, 0)/10, ROUND(((IF(MIN(D$row, E$row, F$row)=D$row, (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(D$row*6*10)+(G$row*6*10), IF(MIN(D$row, E$row, F$row)=E$row, (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(E$row*6*10)+(G$row*6*10), IF(MIN(D$row, E$row, F$row)=F$row, (D$row*4*10)+(E$row*5*10)+(F$row*6*10)-(F$row*6*10)+(G$row*6*10)))))/150)*10, 0)/10)))"
 
     $result_formula = "=IF(OR(D{$row}=\"-\", D{$row}=\"\", E{$row}=\"-\", E{$row}=\"\", F{$row}=\"-\", F{$row}=\"\"), \"-\", IF(OR(G{$row}=\"\", G{$row}<0, G{$row}=\"-\", G{$row}=\"\"), ROUND((((D{$row}*4*10)+(E{$row}*5*10)+(F{$row}*6*10))/150)*10, 0)/10, ROUND((((D{$row}*4*10)+(E{$row}*5*10)+(F{$row}*6*10))/150)*10, 0)/10))";
-    $status_formula = "=IF(OR(H{$row}=\"-\", H{$row}=\"\"), \"-\", IF(I{$row}>15, IF(H{$row}>=6, IF(OR(D{$row}<7, E{$row}<7, F{$row}<7), \"RENF\", \"REPF\"), \"REMF\"), IF(H{$row}>=7, \"APR\", IF(H{$row}>=6, IF(AND(OR(D{$row}<7, E{$row}<7, F{$row}<7), OR(G{$row}=\"-\", G{$row}=\"\")), \"REC\", IF(OR(G{$row}=\"-\", G{$row}=\"\"), IF(H{$row}>=7, \"APR\", \"APRN\"), IF(G{$row}>=7, \"APR\", \"REPN\"))), IF(H{$row}>=7, IF(OR(G{$row}=\"-\", G{$row}=\"\"), \"REC\", \"REP\"), \"REP\")))))";
-
+    $status_formula = "=IF(OR(H{$row}=\"-\", H{$row}=\"\"), \"-\", IF(I{$row}>18, IF(H{$row}>=6, IF(OR(D{$row}<7, E{$row}<7, F{$row}<7), \"RENF\", \"REPF\"), \"REMF\"), IF(H{$row}>=7, \"APR\", IF(H{$row}>=6, IF(AND(OR(D{$row}<7, E{$row}<7, F{$row}<7), OR(G{$row}=\"-\", G{$row}=\"\")), \"REC\", IF(OR(G{$row}=\"-\", G{$row}=\"\"), IF(H{$row}>=7, \"APR\", \"APRN\"), IF(G{$row}>=7, \"APR\", \"REPN\"))), IF(H{$row}>=7, IF(OR(G{$row}=\"-\", G{$row}=\"\"), \"REC\", \"REP\"), \"REP\")))))";
+    //"=IF(OR(H{$row}=\"-\", H{$row}=\"\"), \"-\", IF(I{$row}>18, IF(H{$row}>=6, IF(OR(D{$row}<7, E{$row}<7, F{$row}<7), \"RENF\", \"REPF\"), \"REMF\"), IF(H{$row}>=7, \"APR\", IF(H{$row}>=6, IF(AND(OR(D{$row}<7, E{$row}<7, F{$row}<7), OR(G{$row}=\"-\", G{$row}=\"\")), \"REC\", IF(OR(G{$row}=\"-\", G{$row}=\"\"), IF(H{$row}>=7, \"APR\", \"APRN\"), IF(G{$row}>=7, \"APR\", \"REPN\"))), IF(H{$row}>=7, IF(OR(G{$row}=\"-\", G{$row}=\"\"), \"REC\", \"REP\"), \"REP\")))))";
+    //=SE(OU(H13="-";H13="");"-";SE(I13>18;SE(H13>=6;SE((OU(D13<7;E13<7;F13<7));"RENF";"REPF");"REMF");SE(H13>=7;"APR";SE(H13>=6;SE(E((OU(D13<7;E13<7;F13<7));(OU(G13="-";G13="")));"REC";SE(OU(G13="-";G13="");SE(H13>=7;"APR";"APRN");SE(G13>=7;"APR";"REPN")));SE(H13>=7;SE(OU(G13="-";G13="");"REC";"REP");"REP")))))
 
 
     // Inserindo a fórmula na célula, por exemplo, em "H{$row}"
@@ -253,16 +273,23 @@ foreach ($students as $student) {
 
     // Adicione os outros dados normalmente
     $data = [
-        $matricula,
+        '',//$matricula,
         $fullname,
-        $grade1,
-        $grade2,
-        $grade3,
+        '', //$grade1,
+        '', //$grade2,
+        '', //$grade3,
         '',
         '',//$result_formula,
-        '',
-        //'', // Deixe a fórmula de Situação em J{$row}, já configurada acima
+        $absences,
+        '', // Deixe a fórmula de Situação em J{$row}, já configurada acima
     ];
+
+
+    $sheet->setCellValueExplicit("B{$row}", $matricula, DataType::TYPE_STRING);
+    $sheet->setCellValueExplicit("D{$row}", $grade1, DataType::TYPE_NUMERIC);
+    $sheet->setCellValueExplicit("E{$row}", $grade2, DataType::TYPE_NUMERIC);
+    $sheet->setCellValueExplicit("F{$row}", $grade3, DataType::TYPE_NUMERIC);
+
 
     // Aplicar formatação em negrito às colunas de Matrícula e Nome
     $sheet->getStyle("B{$row}")->getFont()->setBold(true); // Matrícula
@@ -270,9 +297,11 @@ foreach ($students as $student) {
     $sheet->getStyle("D{$row}")->getFont()->setBold(true); // Unid. 1
     $sheet->getStyle("E{$row}")->getFont()->setBold(true); // Unid. 2
     $sheet->getStyle("F{$row}")->getFont()->setBold(true); // Unid. 3
-    $sheet->getStyle("G{$row}")->getFont()->setBold(true); // Resultado
-    $sheet->getStyle("H{$row}")->getFont()->setBold(true); // Faltas
-    $sheet->getStyle("I{$row}")->getFont()->setBold(true); // Situação
+    $sheet->getStyle("G{$row}")->getFont()->setBold(true); // Rec.
+    $sheet->getStyle("H{$row}")->getFont()->setBold(true); // Resultado
+    $sheet->getStyle("I{$row}")->getFont()->setBold(true); // Faltas
+    $sheet->getStyle("J{$row}")->getFont()->setBold(true); // Situação
+
 
     // Alinhar a coluna B à esquerda
     $sheet->getStyle("B{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);

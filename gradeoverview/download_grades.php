@@ -119,7 +119,6 @@ function get_student_grade($studentId, $itemId) {
 
     return $grade ? $grade->finalgrade : null; // Retorna a nota ou null se não encontrar
 }
-
 // Função para obter a matrícula do aluno a partir de um campo personalizado
 function get_student_enrollment($studentId) {
     global $DB;
@@ -187,6 +186,8 @@ if (is_null($course_duration)) {
             ['', ''],  // Linha em branco
         ];
 
+    // Dados para o cabeçalho
+    //$header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
         // Adiciona as informações introdutórias à planilha
         $row = 0;

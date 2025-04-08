@@ -117,8 +117,9 @@ function get_student_grade($studentId, $itemId) {
         'userid' => $studentId // ID do aluno
     ]);
 
-    return $grade ? $grade->finalgrade : null; // Retorna a nota ou null se não encontrar
+    return $grade ? ($grade->finalgrade / 10) : null; // Retorna a nota dividida por 10 ou null se não encontrar
 }
+
 // Função para obter a matrícula do aluno a partir de um campo personalizado
 function get_student_enrollment($studentId) {
     global $DB;
@@ -137,6 +138,39 @@ function get_student_enrollment($studentId) {
 
     return null; // Retorna null se não encontrar o campo ou o dado
 }
+
+function is_student_active_in_course($studentId, $courseId) {
+    global $DB;
+
+    // Verifica se o usuário está ativo no sistema
+    $user = $DB->get_record('user', [
+        'id' => $studentId,
+        'deleted' => 0,
+        'suspended' => 0
+    ]);
+
+    if (!$user) {
+        return false;
+    }
+
+    // Pega todos os métodos de inscrição ativos no curso
+    $enrol_methods = $DB->get_records('enrol', ['courseid' => $courseId, 'status' => 0]);
+
+    foreach ($enrol_methods as $enrol) {
+        $enrolment = $DB->get_record('user_enrolments', [
+            'enrolid' => $enrol->id,
+            'userid' => $studentId,
+            'status' => 0 // status 0 = inscrição ativa
+        ]);
+
+        if ($enrolment) {
+            return true; // Está ativo
+        }
+    }
+
+    return false; // Não está ativo
+}
+
 
 // Criar objeto ODS
 $filename = "notas_{$course->shortname}.ods";
@@ -186,8 +220,6 @@ if (is_null($course_duration)) {
             ['', ''],  // Linha em branco
         ];
 
-    // Dados para o cabeçalho
-    //$header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
         // Adiciona as informações introdutórias à planilha
         $row = 0;
@@ -252,18 +284,21 @@ if (is_null($course_duration)) {
         $studentCount = 0; // Contador para acompanhar a matrícula atual
 
         foreach ($students as $student) {
-            $fullname = strtoupper($student->firstname . ' ' . $student->lastname);
 
+            if (!is_student_active_in_course($student->id, $courseid)) {
+                continue; // Pula o aluno se estiver suspenso ou inativo
+            }
+
+            $fullname = strtoupper($student->firstname . ' ' . $student->lastname);
             // Obter a matrícula do aluno a partir do campo personalizado
             $matricula = get_student_enrollment($student->id);
 
             /*
             // Caso a matrícula seja nula, exibir uma mensagem de erro ou usar um valor padrão
             if (is_null($matricula)) {
-                echo "Erro: Matrícula não encontrada para o aluno {$student->firstname} {$student->lastname}.\n";
+                $matricula = 'Matrícula não encontrada'; // Ou qualquer outro valor padrão
             } else {
                 $matricula = (string) $matricula; // Converte a matrícula para string
-                //echo "Matrícula encontrada para o aluno {$student->firstname} {$student->lastname}: {$matricula}\n";
             }
             */
 

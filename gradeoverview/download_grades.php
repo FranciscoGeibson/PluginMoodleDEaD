@@ -16,7 +16,7 @@ global $DB;
 // Função para obter a carga horária do curso
 function get_course_duration($courseid) {
     global $DB;
-    $field_name = 'edwcoursedurationinhours';
+    $field_name = 'edwcourseduration';
     $field = $DB->get_record('customfield_field', ['shortname' => $field_name]);
 
     if ($field) {

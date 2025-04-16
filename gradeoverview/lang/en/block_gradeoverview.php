@@ -1,16 +1,15 @@
 <?php
-$string['pluginname'] = 'Notas para SIGAA';
-$string['download_xls'] = 'Baixar Planilha de Notas';
-$string['view_tutorial'] = 'Ver Tutorial de Utilização';
 
+$string['pluginname'] = 'Grades for SIGAA';
+$string['download_xls'] = 'Download Grades Spreadsheet';
+$string['view_tutorial'] = 'View Usage Tutorial';
 
-$string['planilha_notas'] = 'PLANILHA DE NOTAS';
-$string['instrucao1'] = 'Para inserir as notas no SIGAA, siga os passos ou veja o tutorial em dead.uern.br/notasparasigaa:';
-$string['instrucao2'] = 'O SIGAA aceita apenas o upload de arquivos no formato .xls';
-$string['instrucao3'] = 'Com esta planilha aberta no Microsoft Excel ou LibreOffice Calc clique em "Arquivo" e "Salvar Como".';
-$string['instrucao4'] = 'Selecione o formato .xls nas opções disponíveis e salve o arquivo.';
-$string['instrucao5'] = 'Abra a tela de cadastro de notas na Turma Virtual do SIGAA e clique no botão "Importar Planilha"';
-$string['instrucao6'] = 'Clique no botão "Escolher Arquivo", selecione a planilha em formato .xls e clique em "Importar"';
+$string['planilha_notas'] = 'GRADES SPREADSHEET';
+$string['instrucao1'] = 'To submit grades to SIGAA, follow the steps below or see the tutorial at dead.uern.br/notasparasigaa:';
+$string['instrucao2'] = 'SIGAA only accepts uploads in the .xls file format.';
+$string['instrucao3'] = 'With this spreadsheet open in Microsoft Excel or LibreOffice Calc, click "File" and then "Save As".';
+$string['instrucao4'] = 'Select the .xls format from the available options and save the file.';
+$string['instrucao5'] = 'Open the grade entry screen in the SIGAA Virtual Class and click the "Import Spreadsheet" button.';
+$string['instrucao6'] = 'Click the "Choose File" button, select the .xls spreadsheet, and click "Import".';
 
-
-$string['ch_nao_definida'] = 'Erro: A carga horária (CH) da turma não foi definida.';
+$string['ch_nao_definida'] = 'Error: The course workload (CH) has not been defined.';

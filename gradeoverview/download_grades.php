@@ -207,17 +207,17 @@ if (is_null($course_duration)) {
 
         // Dados introdutórios
         $intro_text = [
-            ['', ''],  // Linha em branco
-            ['', 'PLANILHA DE NOTAS'],  // Adicionando um espaço antes do título
-            ['', $header_info],  // Mantendo o cabeçalho com deslocamento
-            ['', ''],  // Linha em branco
-            ['', 'Digite as notas das unidades utilizando vírgula para separar a casa decimal.'],
-            ['', 'O campo faltas deve ser preenchido com o número de faltas do aluno durante o período letivo.'],
-            ['', 'A situação do aluno em relação a assiduidade é calculada apenas levando em consideração a carga horária da disciplina.'],
-            ['', 'Devido a isso a situação pode mudar durante a importação da planilha.'],
-            ['', 'As notas das unidades não vão para o histórico do aluno, mas aparecem no portal do aluno.'],
-            ['', 'Altere somente as células em amarelo.'],
-            ['', ''],  // Linha em branco
+            ['', ''],
+            ['', get_string('planilha_notas', 'block_gradeoverview')],
+            ['', $header_info],
+            ['', ''],
+            ['', get_string('instrucao1', 'block_gradeoverview')],
+            ['', get_string('instrucao2', 'block_gradeoverview')],
+            ['', get_string('instrucao3', 'block_gradeoverview')],
+            ['', get_string('instrucao4', 'block_gradeoverview')],
+            ['', get_string('instrucao5', 'block_gradeoverview')],
+            ['', get_string('instrucao6', 'block_gradeoverview')],
+            ['', '']
         ];
 
 

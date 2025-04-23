@@ -10,7 +10,7 @@ $course = $DB->get_record("course", ['id' => $courseid]);
 
 
 $context = context_course::instance($courseid);
-require_capability('block/gradeoverview:view', $context);
+require_capability('block/exportgradesigaa:view', $context);
 
 global $DB;
 // Função para obter a carga horária do curso
@@ -208,15 +208,15 @@ if (is_null($course_duration)) {
         // Dados introdutórios
         $intro_text = [
             ['', ''],
-            ['', get_string('planilha_notas', 'block_gradeoverview')],
+            ['', get_string('planilha_notas', 'block_exportgradesigaa')],
             ['', $header_info],
             ['', ''],
-            ['', get_string('instrucao1', 'block_gradeoverview')],
-            ['', get_string('instrucao2', 'block_gradeoverview')],
-            ['', get_string('instrucao3', 'block_gradeoverview')],
-            ['', get_string('instrucao4', 'block_gradeoverview')],
-            ['', get_string('instrucao5', 'block_gradeoverview')],
-            ['', get_string('instrucao6', 'block_gradeoverview')],
+            ['', get_string('instrucao1', 'block_exportgradesigaa')],
+            ['', get_string('instrucao2', 'block_exportgradesigaa')],
+            ['', get_string('instrucao3', 'block_exportgradesigaa')],
+            ['', get_string('instrucao4', 'block_exportgradesigaa')],
+            ['', get_string('instrucao5', 'block_exportgradesigaa')],
+            ['', get_string('instrucao6', 'block_exportgradesigaa')],
             ['', '']
         ];
 

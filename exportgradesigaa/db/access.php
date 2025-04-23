@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     // Define a capacidade do plugin
-    'block/gradeoverview:view' => [
+    'block/exportgradesigaa:view' => [
         'captype' => 'read', // Capacidade de leitura
         'contextlevel' => CONTEXT_COURSE, // Contexto limitado ao curso
         'archetypes' => [

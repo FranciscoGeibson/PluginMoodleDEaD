@@ -191,7 +191,7 @@ if (is_null($course_duration)) {
 
         $course_turma = strpos($course_shortname, '(T2)') !== false ? '02' : '01';
 
-        $course_fullname = htmlspecialchars($course->fullname);
+        $course_fullname = mb_strtoupper(htmlspecialchars($course->fullname));
         $course_polo = "Polo: MULTIPOLO";
 
         // Extrair o ano do course_shortname_cleaned
@@ -203,7 +203,7 @@ if (is_null($course_duration)) {
         // Dados para o cabeçalho
         //$header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
-        $header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year)";
+        $header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
         // Dados introdutórios
         $intro_text = [
@@ -289,7 +289,7 @@ if (is_null($course_duration)) {
                 continue; // Pula o aluno se estiver suspenso ou inativo
             }
 
-            $fullname = strtoupper($student->firstname . ' ' . $student->lastname);
+            $fullname = mb_strtoupper($student->firstname . ' ' . $student->lastname);
             // Obter a matrícula do aluno a partir do campo personalizado
             $matricula = get_student_enrollment($student->id);
 

@@ -117,7 +117,7 @@ function get_student_grade($studentId, $itemId) {
         'userid' => $studentId // ID do aluno
     ]);
 
-    return $grade ? ($grade->finalgrade / 10) : null; // Retorna a nota dividida por 10 ou null se não encontrar
+    return $grade ? ($grade->finalgrade / 10) : 0; // Retorna a nota dividida por 10 ou 0 se não encontrar
 }
 
 // Função para obter a matrícula do aluno a partir de um campo personalizado
@@ -370,5 +370,4 @@ if (is_null($course_duration)) {
 
    
     }
-
 

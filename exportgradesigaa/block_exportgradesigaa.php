@@ -38,7 +38,7 @@ class block_exportgradesigaa extends block_base
         $this->content->text .= html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), array('class' => 'btn btn-primary'));
 
         // Link para o tutorial
-        $this->content->text .= html_writer::link('https://dead.uern.br', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'));
+        $this->content->text .= html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'));
 
         return $this->content;
     }

@@ -152,9 +152,9 @@ function is_student_active_in_course($studentId, $courseId)
     }
 
     // Pega todos os métodos de inscrição ativos no curso
-    $enrol_methods = $DB->get_records('enrol', ['courseid' => $courseId, 'status' => 0]);
+    $enrol_methxlsx = $DB->get_records('enrol', ['courseid' => $courseId, 'status' => 0]);
 
-    foreach ($enrol_methods as $enrol) {
+    foreach ($enrol_methxlsx as $enrol) {
         $enrolment = $DB->get_record('user_enrolments', [
             'enrolid' => $enrol->id,
             'userid' => $studentId,
@@ -304,12 +304,17 @@ if (is_null($course_duration)) {
 
         // Escreve os dados do aluno na planilha
         foreach ($data as $col => $cell) {
-            if ($col === 2) { // Matrícula sempre como string
-                $activeWorksheet->setCellValue([$col + 1, $row + 1], (string) $cell);
+            if ($col == 1) { // Matrícula sempre como string
+                //$activeWorksheet->setCellValue([$col + 1, $row], (string) $cell);
+                $activeWorksheet->getCell([$col + 1, $row])
+                    ->setValueExplicit(
+                        $cell,
+                        \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                    );
             } elseif (is_numeric($cell)) {
-                $activeWorksheet->setCellValue([$col + 1, $row + 1], $cell);
+                $activeWorksheet->setCellValue([$col + 1, $row], $cell);
             } else {
-                $activeWorksheet->setCellValue([$col + 1, $row + 1], $cell);
+                $activeWorksheet->setCellValue([$col + 1, $row], $cell);
             }
         }
 
@@ -322,13 +327,52 @@ if (is_null($course_duration)) {
         $num_colunas = count($data); // Número total de colunas
         for ($col = 0; $col < $num_colunas; $col++) {
             //$worksheet->write_string($row, $col, ''); // Escreve uma célula vazia
-            $activeWorksheet->setCellValue([$col + 1, $row + 1], '');
+            $activeWorksheet->setCellValue([$col + 1, $row + 1], ' ');
         }
         $row++; // Avança para a próxima linha após o espaço em branco
     }
 
+    // salva o xlsx temporariamente
+    $xlsx_filename = clean_filename(format_string("notas_{$course->shortname}.xlsx"));
+
     $writer = new Xlsx($spreadsheet);
-    $writer->save("notas_{$course->shortname}.xlsx");
+    $writer->save($xlsx_filename);
+
+    //Envia para o servidor de conversão
+    $conversion_server = 'http://localhost:8080/index.php';
+
+    $cfile = new CURLFile($xlsx_filename, 'application/vnd.oasis.opendocument.spreadsheet', basename($xlsx_filename));
+
+    $dados = ['xlsx_file' => $cfile];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $conversion_server);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $dados);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Ajustar
+
+    $http_code = 0;
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    curl_close($ch);
+
+    // Trata a resposta
+    if ($http_code === 200) {
+        // Fornece o XLS convertido para download
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . str_replace('.xlsx', '.xls', $xlsx_filename) . '"');
+        echo $response;
+    } else {
+        // Fallback: disponibiliza o xlsx original se a conversão falhar
+        header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+        header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
+        readfile($xlsx_filename);
+    }
+
+    // Limpeza
+    unlink($xlsx_filename);
 
     exit;
 }

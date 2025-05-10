@@ -268,10 +268,6 @@ if (is_null($course_duration)) {
     //Pegar a REC, se existir
     //Sobre as Unidades, a carga horária <= 45 é de 2 Unidades. Maior que > 45, é de 3 Unidades.
 
-    // Contar quantos alunos existem antes de escrever na planilha
-    $totalStudents = count($students);
-    $studentCount = 0; // Contador para acompanhar a matrícula atual
-
     foreach ($students as $student) {
 
         if (!is_student_active_in_course($student->id, $courseid)) {
@@ -319,18 +315,10 @@ if (is_null($course_duration)) {
         }
 
         $row++; // Avança para a próxima linha
-        $studentCount++; // Incrementa o contador de matrículas
     }
 
     // Após a última matrícula, adicionar uma única linha em branco
-    if ($totalStudents > 0) {
-        $num_colunas = count($data); // Número total de colunas
-        for ($col = 0; $col < $num_colunas; $col++) {
-            //$worksheet->write_string($row, $col, ''); // Escreve uma célula vazia
-            $activeWorksheet->setCellValue([$col + 1, $row + 1], ' ');
-        }
-        $row++; // Avança para a próxima linha após o espaço em branco
-    }
+    $activeWorksheet->setCellValue([2, $row], ' ');
 
     // salva o xlsx temporariamente
     $xlsx_filename = clean_filename(format_string("notas_{$course->shortname}.xlsx"));

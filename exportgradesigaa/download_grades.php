@@ -1,20 +1,22 @@
 <?php
 require_once __DIR__ . '/../../config.php';
-require_once($CFG->libdir . '/odslib.class.php');
+require_once("$CFG->libdir/phpspreadsheet/vendor/autoload.php");
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 require_login();
 
-
 $courseid = required_param('courseid', PARAM_INT);
 $course = $DB->get_record("course", ['id' => $courseid]);
-
 
 $context = context_course::instance($courseid);
 require_capability('block/exportgradesigaa:view', $context);
 
 global $DB;
 // Função para obter a carga horária do curso
-function get_course_duration($courseid) {
+function get_course_duration($courseid)
+{
     global $DB;
     $field_name = 'edwcourseduration';
     $field = $DB->get_record('customfield_field', ['shortname' => $field_name]);
@@ -25,13 +27,12 @@ function get_course_duration($courseid) {
             return "{$data->value}h";
         }
     }
-
-    
     return "(Duração não especificada)";
 }
 
 // Função para obter o ID da categoria de notas com base no nome da unidade
-function get_category_id_by_name($category_prefix, $courseid) {
+function get_category_id_by_name($category_prefix, $courseid)
+{
     global $DB;
 
     // Remove espaços em branco no início e no final do prefixo
@@ -56,12 +57,12 @@ function get_category_id_by_name($category_prefix, $courseid) {
             }
         }
     }
-
     return null; // Retorna null se não encontrar a categoria
 }
 
 // Função para obter o ID do item de nota com base no nome da atividade da Quarta Prova
-function get_item_id_by_activity_name_Quarta_Prova($activity_prefix, $courseid) {
+function get_item_id_by_activity_name_Quarta_Prova($activity_prefix, $courseid)
+{
     global $DB;
 
     // Remove espaços em branco no início e no final do prefixo
@@ -86,13 +87,12 @@ function get_item_id_by_activity_name_Quarta_Prova($activity_prefix, $courseid) 
             }
         }
     }
-
     return null; // Retorna null se não encontrar o item
 }
 
-
 // Função para obter o ID do item de nota com base no ID da categoria
-function get_item_id_by_category($category_id, $courseid) {
+function get_item_id_by_category($category_id, $courseid)
+{
     global $DB;
 
     // Busca o item de nota na tabela grade_items
@@ -101,14 +101,12 @@ function get_item_id_by_category($category_id, $courseid) {
         'courseid' => $courseid, // ID do curso
         'itemtype' => 'category' // Tipo de item (categoria)
     ]);
-
     return $item ? $item->id : null; // Retorna o ID do item ou null se não encontrar
 }
 
-
-
 // Função para obter a nota de um aluno em uma categoria
-function get_student_grade($studentId, $itemId) {
+function get_student_grade($studentId, $itemId)
+{
     global $DB;
 
     // Busca a nota do aluno na tabela grade_grades
@@ -116,12 +114,12 @@ function get_student_grade($studentId, $itemId) {
         'itemid' => $itemId, // ID do item de nota
         'userid' => $studentId // ID do aluno
     ]);
-
     return $grade ? ($grade->finalgrade / 10) : 0; // Retorna a nota dividida por 10 ou 0 se não encontrar
 }
 
 // Função para obter a matrícula do aluno a partir de um campo personalizado
-function get_student_enrollment($studentId) {
+function get_student_enrollment($studentId)
+{
     global $DB;
 
     // Obter o campo de perfil pelo nome breve 'matricula'
@@ -135,11 +133,11 @@ function get_student_enrollment($studentId) {
             return substr($data->data, 3); // Remove os 3 primeiros caracteres (DLL)
         }
     }
-
     return null; // Retorna null se não encontrar o campo ou o dado
 }
 
-function is_student_active_in_course($studentId, $courseId) {
+function is_student_active_in_course($studentId, $courseId)
+{
     global $DB;
 
     // Verifica se o usuário está ativo no sistema
@@ -167,207 +165,170 @@ function is_student_active_in_course($studentId, $courseId) {
             return true; // Está ativo
         }
     }
-
     return false; // Não está ativo
 }
 
-
-// Criar objeto ODS
-$filename = "notas_{$course->shortname}.ods";
-$workbook = new MoodleODSWorkbook(format_string($course->fullname, true));
-$workbook->send($filename);
-$worksheet = $workbook->add_worksheet("Notas");
-
 $course_duration = get_course_duration($courseid);
 
+$spreadsheet = new Spreadsheet();
+$activeWorksheet = $spreadsheet->getActiveSheet();
 
 if (is_null($course_duration)) {
     echo "Erro: A carga horária (CH) da turma não foi definida.\n";
 } else {
-        //Colocar a pesquisa da turma recursiva, T2...T3...T4...T5
-        // Determinar a turma
-        $course_shortname = htmlspecialchars($course->shortname);
-        $course_shortname_cleaned = preg_replace('/\s*\(T[12]\)/', '', $course_shortname); // Remove "(T1)" ou "(T2)"
+    //Colocar a pesquisa da turma recursiva, T2...T3...T4...T5
+    // Determinar a turma
+    $course_shortname = htmlspecialchars($course->shortname);
+    $course_shortname_cleaned = preg_replace('/\s*\(T[12]\)/', '', $course_shortname); // Remove "(T1)" ou "(T2)"
 
-        $course_turma = strpos($course_shortname, '(T2)') !== false ? '02' : '01';
+    $course_turma = strpos($course_shortname, '(T2)') !== false ? '02' : '01';
 
-        $course_fullname = mb_strtoupper(htmlspecialchars($course->fullname));
-        $course_polo = "Polo: MULTIPOLO";
+    $course_fullname = mb_strtoupper(htmlspecialchars($course->fullname));
+    $course_polo = "Polo: MULTIPOLO";
 
-        // Extrair o ano do course_shortname_cleaned
-        // Assumimos que o formato é algo como "2024.2 - DSI0007 - Nome do Curso"
-        preg_match('/^(\d{4}\.\d)\s*-\s*(.+)/', $course_shortname_cleaned, $matches);
-        $course_year = isset($matches[1]) ? $matches[1] : 'AnoIndefinido';
-        $course_shortname_cleaned_year = isset($matches[2]) ? str_replace(' - ', '', $matches[2]) : $course_shortname_cleaned;
+    // Extrair o ano do course_shortname_cleaned
+    // Assumimos que o formato é algo como "2024.2 - DSI0007 - Nome do Curso"
+    preg_match('/^(\d{4}\.\d)\s*-\s*(.+)/', $course_shortname_cleaned, $matches);
+    $course_year = isset($matches[1]) ? $matches[1] : 'AnoIndefinido';
+    $course_shortname_cleaned_year = isset($matches[2]) ? str_replace(' - ', '', $matches[2]) : $course_shortname_cleaned;
 
-        // Dados para o cabeçalho
-        //$header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
+    // Dados para o cabeçalho
+    //$header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
-        $header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
+    $header_info = "$course_shortname_cleaned_year - $course_fullname ($course_duration) - Turma: $course_turma ($course_year) - $course_polo";
 
-        // Dados introdutórios
-        $intro_text = [
-            ['', ''],
-            ['', get_string('planilha_notas', 'block_exportgradesigaa')],
-            ['', $header_info],
-            ['', ''],
-            ['', get_string('instrucao1', 'block_exportgradesigaa')],
-            ['', get_string('instrucao2', 'block_exportgradesigaa')],
-            ['', get_string('instrucao3', 'block_exportgradesigaa')],
-            ['', get_string('instrucao4', 'block_exportgradesigaa')],
-            ['', get_string('instrucao5', 'block_exportgradesigaa')],
-            ['', get_string('instrucao6', 'block_exportgradesigaa')],
-            ['', '']
-        ];
+    // Dados introdutórios
+    $intro_text = [
+        ['', ''],
+        ['', get_string('planilha_notas', 'block_exportgradesigaa')],
+        ['', $header_info],
+        ['', ''],
+        ['', get_string('instrucao1', 'block_exportgradesigaa')],
+        ['', get_string('instrucao2', 'block_exportgradesigaa')],
+        ['', get_string('instrucao3', 'block_exportgradesigaa')],
+        ['', get_string('instrucao4', 'block_exportgradesigaa')],
+        ['', get_string('instrucao5', 'block_exportgradesigaa')],
+        ['', get_string('instrucao6', 'block_exportgradesigaa')],
+        ['', '']
+    ];
 
-
-        // Adiciona as informações introdutórias à planilha
-        $row = 0;
-        foreach ($intro_text as $line) {
-            $col = 0;
-            foreach ($line as $cell) {
-                $worksheet->write_string($row, $col++, $cell);
-            }
-            $row++;
-        }
-
-        // Cabeçalhos da tabela
-        $headers = ['', 'Matrícula', 'Nome', 'Unid. 1', 'Unid. 2', 'Unid. 3', 'Rec.', 'Resultado', 'Faltas', 'Sit.'];
-        $col = 0;
-        foreach ($headers as $header) {
-            $worksheet->write_string($row, $col++, $header);
+    // Adiciona as informações introdutórias à planilha
+    $row = 1;
+    foreach ($intro_text as $line) {
+        $col = 2;
+        foreach ($line as $cell) {
+            //$worksheet->write_string($row, $col++, $cell);
+            $activeWorksheet->setCellValue([$col, $row], $cell);
         }
         $row++;
-
-        // Obter o ID do item de nota da "Quarta Prova"
-        $quarta_prova_item_id = get_item_id_by_activity_name_Quarta_Prova('Quarta Prova', $courseid);
-
-        // Dados dos alunos
-        $students = get_role_users($DB->get_record("role", ['shortname' => 'student'])->id, $context);
-
-
-        // Mapeamento da carga horária para o número de unidades
-        $unidades_por_ch = [
-            45 => 2, // Até 45 horas: 2 unidades
-            PHP_INT_MAX => 3, // Acima de 45 horas: 3 unidades
-        ];
-
-        // Determinar o número de unidades com base na carga horária
-        $num_unidades = 3; // Valor padrão (mais de 45 horas)
-        foreach ($unidades_por_ch as $ch_maxima => $unidades) {
-            if (intval($course_duration) <= $ch_maxima) {
-                $num_unidades = $unidades;
-                break;
-            }
-        }
-
-        // Obter os IDs das categorias de notas com base no número de unidades
-        $unit1_category_id = get_category_id_by_name('Unidade 1', $courseid);
-        $unit2_category_id = get_category_id_by_name('Unidade 2', $courseid);
-        $unit3_category_id = ($num_unidades == 3) ? get_category_id_by_name('Unidade 3', $courseid) : null;
-        //$rec_category_id = get_category_id_by_name('Recuperação', $courseid); // Busca a categoria da recuperação
-
-        // Passo 2: Obter o ID do item de nota
-        $unit1_item_id = get_item_id_by_category($unit1_category_id, $courseid);
-        $unit2_item_id = get_item_id_by_category($unit2_category_id, $courseid);
-        $unit3_item_id = get_item_id_by_category($unit3_category_id, $courseid);
-        //$rec_item_id = get_item_id_by_category($rec_category_id, $courseid); // Busca o item da recuperação
-
-        //Pegar a REC, se existir
-        //Sobre as Unidades, a carga horária <= 45 é de 2 Unidades. Maior que > 45, é de 3 Unidades.
-
-        
-        // Obtém a lista de alunos matriculados no curso
-        //$students = get_role_users($DB->get_record("role", ['shortname' => 'student'])->id, $context);
-        // Contar quantos alunos existem antes de escrever na planilha
-        $totalStudents = count($students);
-        $studentCount = 0; // Contador para acompanhar a matrícula atual
-
-        foreach ($students as $student) {
-
-            if (!is_student_active_in_course($student->id, $courseid)) {
-                continue; // Pula o aluno se estiver suspenso ou inativo
-            }
-
-            $fullname = mb_strtoupper($student->firstname . ' ' . $student->lastname);
-            // Obter a matrícula do aluno a partir do campo personalizado
-            $matricula = get_student_enrollment($student->id);
-
-            /*
-            // Caso a matrícula seja nula, exibir uma mensagem de erro ou usar um valor padrão
-            if (is_null($matricula)) {
-                $matricula = 'Matrícula não encontrada'; // Ou qualquer outro valor padrão
-            } else {
-                $matricula = (string) $matricula; // Converte a matrícula para string
-            }
-            */
-
-            $grade1 = get_student_grade($student->id, $unit1_item_id);
-            $grade2 = get_student_grade($student->id, $unit2_item_id);
-            $grade3 = get_student_grade($student->id, $unit3_item_id);
-            //$rec_grade = get_student_grade($student->id, $rec_item_id); // Nota da recuperação
-            $quarta_prova_grade = get_student_grade($student->id, $quarta_prova_item_id); // Nota da Quarta Prova
-
-            /*
-            if (is_null($grade1)) {
-                echo "Erro: Nota da Unidade 1 inválida ou não encontrada para o aluno {$student->firstname} {$student->lastname}.\n";
-            } else {
-                //echo "Nota da Unidade 1 para o aluno {$student->firstname} {$student->lastname}: {$grade1}\n";
-            }
-
-            if (is_null($grade2)) {
-                echo "Erro: Nota da Unidade 2 inválida ou não encontrada para o aluno {$student->firstname} {$student->lastname}.\n";
-            } else {
-                //echo "Nota da Unidade 2 para o aluno {$student->firstname} {$student->lastname}: {$grade2}\n";
-            }
-
-            if (is_null($grade3)) {
-                echo "Erro: Nota da Unidade 3 inválida ou não encontrada para o aluno {$student->firstname} {$student->lastname}.\n";
-            } else {
-                //echo "Nota da Unidade 3 para o aluno {$student->firstname} {$student->lastname}: {$grade3}\n";
-            }
-            */
-            
-            // Adiciona os dados do aluno à planilha
-            $data = [
-                '', (string) $matricula, // Matrícula sempre como string
-                $fullname,
-                $grade1, //grade1
-                $grade2, //grade2
-                $grade3, //grade3
-                $quarta_prova_grade, //Recuperação
-                '',//$result_formula,
-                0,  // Número de faltas padrão
-                '', //$status_formula,
-            ];
-
-            // Escreve os dados do aluno na planilha
-            foreach ($data as $col => $cell) {
-                if ($col === 1) { // Matrícula sempre como string
-                    $worksheet->write_string($row, $col, (string) $cell);
-                } elseif (is_numeric($cell)) {
-                    $worksheet->write_number($row, $col, $cell);
-                } else {
-                    $worksheet->write_string($row, $col, $cell);
-                }
-            }
-            
-            $row++; // Avança para a próxima linha
-            $studentCount++; // Incrementa o contador de matrículas
-        }
-        
-        // Após a última matrícula, adicionar uma única linha em branco
-        if ($totalStudents > 0) {
-            $num_colunas = count($data); // Número total de colunas
-            for ($col = 0; $col < $num_colunas; $col++) {
-                $worksheet->write_string($row, $col, ''); // Escreve uma célula vazia
-            }
-            $row++; // Avança para a próxima linha após o espaço em branco
-        }
-        // Finaliza e exporta o arquivo
-        $workbook->close();
-        exit;
-
-   
     }
 
+    // Cabeçalhos da tabela
+    $headers = ['', 'Matrícula', 'Nome', 'Unid. 1', 'Unid. 2', 'Unid. 3', 'Rec.', 'Resultado', 'Faltas', 'Sit.'];
+    $col = 1;
+    foreach ($headers as $header) {
+        //$worksheet->write_string($row, $col++, $header);
+        $activeWorksheet->setCellValue([$col++, $row], $header);
+    }
+    $row++;
+
+    // Obter o ID do item de nota da "Quarta Prova"
+    $quarta_prova_item_id = get_item_id_by_activity_name_Quarta_Prova('Quarta Prova', $courseid);
+
+    // Dados dos alunos
+    $students = get_role_users($DB->get_record("role", ['shortname' => 'student'])->id, $context);
+
+    // Mapeamento da carga horária para o número de unidades
+    $unidades_por_ch = [
+        45 => 2, // Até 45 horas: 2 unidades
+        PHP_INT_MAX => 3, // Acima de 45 horas: 3 unidades
+    ];
+
+    // Determinar o número de unidades com base na carga horária
+    $num_unidades = 3; // Valor padrão (mais de 45 horas)
+    foreach ($unidades_por_ch as $ch_maxima => $unidades) {
+        if (intval($course_duration) <= $ch_maxima) {
+            $num_unidades = $unidades;
+            break;
+        }
+    }
+
+    // Obter os IDs das categorias de notas com base no número de unidades
+    $unit1_category_id = get_category_id_by_name('Unidade 1', $courseid);
+    $unit2_category_id = get_category_id_by_name('Unidade 2', $courseid);
+    $unit3_category_id = ($num_unidades == 3) ? get_category_id_by_name('Unidade 3', $courseid) : null;
+    //$rec_category_id = get_category_id_by_name('Recuperação', $courseid); // Busca a categoria da recuperação
+
+    // Passo 2: Obter o ID do item de nota
+    $unit1_item_id = get_item_id_by_category($unit1_category_id, $courseid);
+    $unit2_item_id = get_item_id_by_category($unit2_category_id, $courseid);
+    $unit3_item_id = get_item_id_by_category($unit3_category_id, $courseid);
+    //$rec_item_id = get_item_id_by_category($rec_category_id, $courseid); // Busca o item da recuperação
+
+    //Pegar a REC, se existir
+    //Sobre as Unidades, a carga horária <= 45 é de 2 Unidades. Maior que > 45, é de 3 Unidades.
+
+    // Contar quantos alunos existem antes de escrever na planilha
+    $totalStudents = count($students);
+    $studentCount = 0; // Contador para acompanhar a matrícula atual
+
+    foreach ($students as $student) {
+
+        if (!is_student_active_in_course($student->id, $courseid)) {
+            continue; // Pula o aluno se estiver suspenso ou inativo
+        }
+
+        $fullname = mb_strtoupper($student->firstname . ' ' . $student->lastname);
+        // Obter a matrícula do aluno a partir do campo personalizado
+        $matricula = get_student_enrollment($student->id);
+
+        $grade1 = get_student_grade($student->id, $unit1_item_id);
+        $grade2 = get_student_grade($student->id, $unit2_item_id);
+        $grade3 = get_student_grade($student->id, $unit3_item_id);
+        //$rec_grade = get_student_grade($student->id, $rec_item_id); // Nota da recuperação
+        $quarta_prova_grade = get_student_grade($student->id, $quarta_prova_item_id); // Nota da Quarta Prova
+
+        // Adiciona os dados do aluno à planilha
+        $data = [
+            '',
+            (string) $matricula, // Matrícula sempre como string
+            $fullname,
+            $grade1, //grade1
+            $grade2, //grade2
+            $grade3, //grade3
+            $quarta_prova_grade, //Recuperação
+            '', //$result_formula,
+            0,  // Número de faltas padrão
+            '', //$status_formula,
+        ];
+
+        // Escreve os dados do aluno na planilha
+        foreach ($data as $col => $cell) {
+            if ($col === 2) { // Matrícula sempre como string
+                $activeWorksheet->setCellValue([$col + 1, $row + 1], (string) $cell);
+            } elseif (is_numeric($cell)) {
+                $activeWorksheet->setCellValue([$col + 1, $row + 1], $cell);
+            } else {
+                $activeWorksheet->setCellValue([$col + 1, $row + 1], $cell);
+            }
+        }
+
+        $row++; // Avança para a próxima linha
+        $studentCount++; // Incrementa o contador de matrículas
+    }
+
+    // Após a última matrícula, adicionar uma única linha em branco
+    if ($totalStudents > 0) {
+        $num_colunas = count($data); // Número total de colunas
+        for ($col = 0; $col < $num_colunas; $col++) {
+            //$worksheet->write_string($row, $col, ''); // Escreve uma célula vazia
+            $activeWorksheet->setCellValue([$col + 1, $row + 1], '');
+        }
+        $row++; // Avança para a próxima linha após o espaço em branco
+    }
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save("notas_{$course->shortname}.xlsx");
+
+    exit;
+}

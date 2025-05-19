@@ -3,6 +3,20 @@ require_once __DIR__ . '/../../config.php';
 require_once("$CFG->libdir/phpspreadsheet/vendor/autoload.php");
 //
 
+function check_conversion_server($server_url) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $server_url . '?healthcheck=1');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        return $http_code === 200;
+}
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -14,7 +28,11 @@ $course = $DB->get_record("course", ['id' => $courseid]);
 $context = context_course::instance($courseid);
 require_capability('block/exportgradesigaa:view', $context);
 
-global $DB;
+
+// Variaveis globais
+global $DB, $SESSION;
+
+
 // Função para obter a carga horária do curso
 function get_course_duration($courseid)
 {
@@ -327,6 +345,9 @@ if (is_null($course_duration)) {
     $writer = new Xlsx($spreadsheet);
     $writer->save($xlsx_filename);
 
+
+    
+
     //Envia para o servidor de conversão
     $conversion_server = 'http://localhost:8080/index.php';
 
@@ -334,6 +355,52 @@ if (is_null($course_duration)) {
 
     $dados = ['xlsx_file' => $cfile];
 
+    // Primeiro verifica se o servidor está operacional
+    if (check_conversion_server($conversion_server)) {
+        $cfile = new CURLFile($xlsx_filename, 'application/vnd.oasis.opendocument.spreadsheet', basename($xlsx_filename));
+        $dados = ['xlsx_file' => $cfile];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $conversion_server);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dados);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code === 200) {
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment; filename="' . str_replace('.xlsx', '.xls', $xlsx_filename) . '"');
+            echo $response;
+            unlink($xlsx_filename);
+            exit;
+        }
+        else {
+            $OUTPUT->notification('message', get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');
+
+            // Fallback: disponibiliza o xlsx original se a conversão falhar
+            header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+            header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
+            readfile($xlsx_filename);
+        }
+    }
+    else {
+        // Log do erro para diagnóstico
+        //error_log("Servidor de conversão indisponível");
+        $SESSION->gradeoverview_error = get_string('servidor_nao_encontrado', 'block_exportgradesigaa');
+        redirect(new moodle_url('/course/view.php', ['id' => $courseid]));
+
+
+        // Se o servidor de conversão não estiver operacional, disponibiliza o xlsx original
+        header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+        header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
+        readfile($xlsx_filename);
+    }
+
+    /*
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $conversion_server);
     curl_setopt($ch, CURLOPT_POST, 1);
@@ -359,7 +426,7 @@ if (is_null($course_duration)) {
         header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
         readfile($xlsx_filename);
     }
-
+    */
     // Limpeza
     unlink($xlsx_filename);
 

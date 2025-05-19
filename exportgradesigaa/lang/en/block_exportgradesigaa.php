@@ -13,3 +13,10 @@ $string['instrucao5'] = 'Open the grade entry screen in the SIGAA Virtual Class 
 $string['instrucao6'] = 'Click the "Choose File" button, select the .xls spreadsheet, and click "Import".';
 
 $string['ch_nao_definida'] = 'Error: The course workload (CH) has not been defined.';
+$string['matricula_nao_encontrada'] = 'Error: The student enrollment was not found.';
+$string['notas_nao_encontradas'] = 'Error: No grades were found for the student.';
+
+$string['servidor_nao_encontrado'] = 'Error: The server was not found.';
+$string['erro_geral'] = 'Error: An unexpected error occurred. Please contact the administrator.';
+
+$string['aguarde_download'] = 'Please wait while the file is being generated.';

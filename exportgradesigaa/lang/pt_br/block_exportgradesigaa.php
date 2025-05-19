@@ -13,3 +13,9 @@ $string['instrucao5'] = 'Abra a tela de cadastro de notas na Turma Virtual do SI
 $string['instrucao6'] = 'Clique no botão "Escolher Arquivo", selecione a planilha em formato .xls e clique em "Importar".';
 
 $string['ch_nao_definida'] = 'Erro: A carga horária (CH) da turma não foi definida.';
+$string['matricula_nao_encontrada'] = 'Erro: A matrícula do aluno não foi encontrada.';
+$string['notas_nao_encontradas'] = 'Erro: Nenhuma nota foi encontrada para o aluno.';
+
+$string['servidor_nao_encontrado'] = 'Erro: O servidor não foi encontrado.';
+
+$string['aguarde_download'] = 'Aguarde enquanto o arquivo está sendo gerado.';

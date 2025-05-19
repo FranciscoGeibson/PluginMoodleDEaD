@@ -1,5 +1,20 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xlsx_file'])) {
+
+$allowed_ips = ['127.0.0.1', '::1', '172.17.0.1'];
+$allowed_token = 'segredo123';
+
+$client_ip = $_SERVER['REMOTE_ADDR'];
+$headers = getallheaders();
+
+if (!in_array($client_ip, $allowed_ips)) {
+    http_response_code(403);
+    echo "Acesso negado: IP não autorizado.";
+    exit;
+} else if (!isset($headers['X-Auth-Token']) || $headers['X-Auth-Token'] !== $allowed_token) {
+    http_response_code(403);
+    echo "Acesso negado: token inválido.";
+    exit;
+} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xlsx_file'])) {
     $maxExecutionTime = 300; // 5 minutos
 
     // Aumentar tempo de execução
@@ -119,4 +134,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['xlsx_file'])) {
 </body>
 
 </html>
-

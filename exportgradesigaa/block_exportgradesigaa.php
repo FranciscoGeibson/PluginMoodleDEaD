@@ -42,9 +42,6 @@ class block_exportgradesigaa extends block_base
 
         // Gera o link para o download do CSV
         $url = new moodle_url('/blocks/exportgradesigaa/download_grades.php', array('courseid' => $COURSE->id));
-        //$this->content->text .= html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), array('class' => 'btn btn-primary'));
-        // Link para o tutorial
-        //$this->content->text .= html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'));
 
         $this->content->text .= html_writer::div(
             html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), array(
@@ -61,7 +58,6 @@ class block_exportgradesigaa extends block_base
                 <span style="margin-left: 8px;">' . get_string('aguarde_download', 'block_exportgradesigaa') . '</span>
             </div>'
         );
-
         
         // Link para o tutorial
         $this->content->text .= html_writer::div(

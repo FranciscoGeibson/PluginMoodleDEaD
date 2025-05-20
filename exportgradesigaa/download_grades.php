@@ -385,6 +385,10 @@ if (is_null($course_duration)) {
         if ($http_code === 200) {
             header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment; filename="' . str_replace('.xlsx', '.xls', $xlsx_filename) . '"');
+
+            // Define o cookie para indicar que o download foi iniciado
+            setcookie('fileDownload', 'true', time() + 60, '/');
+
             echo $response;
             unlink($xlsx_filename);
             exit;

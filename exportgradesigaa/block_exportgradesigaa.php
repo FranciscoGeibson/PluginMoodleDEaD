@@ -67,23 +67,37 @@ class block_exportgradesigaa extends block_base
         // Adiciona o script para o botão de download e animação de loading
         $this->content->text .= html_writer::script("
             document.addEventListener('DOMContentLoaded', function() {
-                var btn = document.getElementById('download-xls-button');
+                const btn = document.getElementById('download-xls-button');
+                const spinner = document.getElementById('loading-spinner');
+
                 if (btn) {
-                    btn.addEventListener('click', function(event) {
-                        // Mostra o loading e desativa o botão
-                        var spinner = document.getElementById('loading-spinner');
-                        if (spinner) spinner.style.display = 'block';
+                    btn.addEventListener('click', function() {
+                        const url = btn.getAttribute('data-url');
 
-                        btn.classList.add('disabled');
-                        btn.setAttribute('aria-disabled', 'true');
-                        btn.style.pointerEvents = 'none';
+                        spinner.style.display = 'block';
+                        btn.disabled = true;
 
-                        // Permite que o link ainda funcione
-                        setTimeout(function() {
-                            window.location.href = btn.href;
-                        }, 100);
+                        // Remove o cookie antigo
+                        document.cookie = 'fileDownload=; Max-Age=0; path=/';
 
-                        event.preventDefault();
+                        // Cria iframe invisível para iniciar o download
+                        const iframe = document.createElement('iframe');
+                        iframe.style.display = 'none';
+                        iframe.src = url;
+                        document.body.appendChild(iframe);
+
+                        // Verifica quando o cookie aparece
+                        const interval = setInterval(() => {
+                            if (document.cookie.includes('fileDownload=true')) {
+                                clearInterval(interval);
+                                spinner.style.display = 'none';
+                                btn.disabled = false;
+
+                                // Remove o cookie e o iframe
+                                document.cookie = 'fileDownload=; Max-Age=0; path=/';
+                                iframe.remove();
+                            }
+                        }, 500);
                     });
                 }
             });

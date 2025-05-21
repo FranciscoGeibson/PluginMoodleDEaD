@@ -43,20 +43,23 @@ class block_exportgradesigaa extends block_base
         // Gera o link para o download do CSV
         $url = new moodle_url('/blocks/exportgradesigaa/download_grades.php', array('courseid' => $COURSE->id));
 
+        // Botões de download e mensagens de sucesso e info
         $this->content->text .= html_writer::div(
-            html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), array(
+            html_writer::link($url, get_string('download_xls', 'block_gradeoverview'), [
                 'class' => 'btn btn-primary',
-                'id' => 'download-xls-button'
-            )),
+                'id' => 'download-xls-button',
+                'data-url' => $url
+            ]) .
+            html_writer::div(get_string('aguarde_download', 'block_gradeoverview'), 'alert alert-info', [
+                'id' => 'info-message',
+                'style' => 'display:none; margin-top:10px;'
+            ]) .
+            html_writer::div(get_string('download_sucesso', 'block_gradeoverview'), 'alert alert-success', [
+                'id' => 'success-message',
+                'style' => 'display:none; margin-top:10px;'
+            ]),
             '',
-            array('style' => 'margin-bottom: 10px;')
-        );
-
-        $this->content->text .= html_writer::div(
-            '<div id="loading-spinner" style="display:none; margin-top:10px;">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                <span style="margin-left: 8px;">' . get_string('aguarde_download', 'block_exportgradesigaa') . '</span>
-            </div>'
+            ['style' => 'margin-bottom: 10px;']
         );
         
         // Link para o tutorial
@@ -68,32 +71,43 @@ class block_exportgradesigaa extends block_base
         $this->content->text .= html_writer::script("
             document.addEventListener('DOMContentLoaded', function() {
                 const btn = document.getElementById('download-xls-button');
-                const spinner = document.getElementById('loading-spinner');
+                const infoMsg = document.getElementById('info-message');
+                const successMsg = document.getElementById('success-message');
 
                 if (btn) {
                     btn.addEventListener('click', function() {
                         const url = btn.getAttribute('data-url');
 
-                        spinner.style.display = 'block';
                         btn.disabled = true;
 
-                        // Remove o cookie antigo
+                        // Mostra mensagem de aguarde
+                        if (infoMsg) {
+                            infoMsg.style.display = 'block';
+                        }
+
+                        // Remove cookie antigo
                         document.cookie = 'fileDownload=; Max-Age=0; path=/';
 
-                        // Cria iframe invisível para iniciar o download
+                        // Cria iframe invisível
                         const iframe = document.createElement('iframe');
                         iframe.style.display = 'none';
                         iframe.src = url;
                         document.body.appendChild(iframe);
 
-                        // Verifica quando o cookie aparece
+                        // Espera o cookie do download
                         const interval = setInterval(() => {
                             if (document.cookie.includes('fileDownload=true')) {
                                 clearInterval(interval);
-                                spinner.style.display = 'none';
                                 btn.disabled = false;
 
-                                // Remove o cookie e o iframe
+                                // Oculta a mensagem de info e mostra sucesso
+                                if (infoMsg) {
+                                    infoMsg.style.display = 'none';
+                                }
+                                if (successMsg) {
+                                    successMsg.style.display = 'block';
+                                }
+
                                 document.cookie = 'fileDownload=; Max-Age=0; path=/';
                                 iframe.remove();
                             }

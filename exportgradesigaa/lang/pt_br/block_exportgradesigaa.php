@@ -19,3 +19,4 @@ $string['notas_nao_encontradas'] = 'Erro: Nenhuma nota foi encontrada para o alu
 $string['servidor_nao_encontrado'] = 'Erro: O servidor está inoperante. Entre em contato com o suporte.';
 
 $string['aguarde_download'] = 'Aguarde enquanto o arquivo está sendo gerado.';
+$string['download_sucesso'] = 'Download concluído com sucesso!';

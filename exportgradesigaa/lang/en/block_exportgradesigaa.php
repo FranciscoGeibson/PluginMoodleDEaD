@@ -21,3 +21,5 @@ $string['erro_geral'] = 'Error: An unexpected error occurred. Please contact the
 
 $string['aguarde_download'] = 'Please wait while the file is being generated.';
 $string['download_sucesso'] = 'Download completed successfully. The file is ready for download.';
+
+$string['alerta_beta'] = 'Atenção, este software está em versão beta e pode apresentar erros ou instabilidades. Verifique se as notas dos alunos estão corretas antes de confirmar a importação no SIGAA.';

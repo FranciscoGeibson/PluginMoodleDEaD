@@ -49,23 +49,29 @@ class block_exportgradesigaa extends block_base
                 'id' => 'info-message',
                 'style' => 'display:none; margin-top:10px;'
             ]) .
-            html_writer::div(get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
-                'id' => 'success-message',
-                'style' => 'display:none; margin-top:10px;'
-            ]) .
-            html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), [
-                'class' => 'btn btn-primary',
-                'id' => 'download-xls-button',
-                'data-url' => $url
-            ]),
+                html_writer::div(get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
+                    'id' => 'success-message',
+                    'style' => 'display:none; margin-top:10px;'
+                ]) .
+                html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), [
+                    'class' => 'btn btn-primary',
+                    'id' => 'download-xls-button',
+                    'data-url' => $url
+                ]),
             '',
             ['style' => 'margin-bottom: 10px;']
         );
 
-        // Link para o tutorial
+        
+        
         $this->content->text .= html_writer::div(
             html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'))
         );
+        
+        $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", ['style' => 'margin-top: 20px;']);
+
+
+
 
         // Adiciona o script para o botão de download e animação de loading
         $this->content->text .= html_writer::script("

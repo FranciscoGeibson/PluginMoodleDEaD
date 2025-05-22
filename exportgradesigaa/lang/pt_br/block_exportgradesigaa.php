@@ -20,3 +20,6 @@ $string['servidor_nao_encontrado'] = 'Erro: O servidor está inoperante. Entre e
 
 $string['aguarde_download'] = 'Aguarde enquanto o arquivo está sendo gerado.';
 $string['download_sucesso'] = 'Download concluído com sucesso!';
+
+$string['alerta_beta'] = 'Atenção, este software está em versão beta e pode apresentar erros ou instabilidades. Verifique se as notas dos alunos estão corretas antes de confirmar a importação no SIGAA.';
+

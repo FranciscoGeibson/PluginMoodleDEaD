@@ -52,25 +52,27 @@ class block_exportgradesigaa extends block_base
                 html_writer::div(get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
                     'id' => 'success-message',
                     'style' => 'display:none; margin-top:10px;'
-                ]) .
-                html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), [
-                    'class' => 'btn btn-primary',
-                    'id' => 'download-xls-button',
-                    'data-url' => $url
                 ]),
             '',
             ['style' => 'margin-bottom: 10px;']
         );
 
         
-        
-        $this->content->text .= html_writer::div(
-            html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'))
-        );
-        
         $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'Edit me', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'margin-top: 20px; font-weight: bold;']);
-        $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", []);
+        $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", ['style' => "margin-bottom: 20px;"]);
 
+
+        $this->content->text .= html_writer::start_tag("a",['href' => $url]);
+        $this->content->text .= html_writer::start_tag("button",['class' => 'btn btn-primary','id' => 'download-xls-button', 'style' => 'margin-bottom: 10px;']);
+        $this->content->text .= get_string('download_xls', 'block_exportgradesigaa');
+        $this->content->text .= html_writer::end_tag("button");
+        $this->content->text .= html_writer::end_tag("a");
+
+        $this->content->text .= html_writer::start_tag("a",['href' => 'https://dead.uern.br/notasparasigaa']);
+        $this->content->text .= html_writer::start_tag("button",['class' => 'btn btn-secondary','id' => 'tutorial-xls-button', 'style' => 'margin-bottom: 10px;']);
+        $this->content->text .= get_string('view_tutorial', 'block_exportgradesigaa');
+        $this->content->text .= html_writer::end_tag("button");
+        $this->content->text .= html_writer::end_tag("a");
 
 
 

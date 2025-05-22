@@ -205,8 +205,8 @@ if (is_null($course_duration)) {
 } else {
 
     //Envia para o servidor de conversão
-    $conversion_server = 'http://localhost:8080/index.php';
-    $secret = 'segredo123'; // mesma chave do servidor
+    $conversion_server = ''; // endpoint do servidor
+    $secret = ''; // mesma chave do servidor
 
     if (check_conversion_server($conversion_server, $secret)) {
         //Colocar a pesquisa da turma recursiva, T2...T3...T4...T5
@@ -385,14 +385,14 @@ if (is_null($course_duration)) {
             // Define o cookie para indicar que o download foi iniciado
             setcookie('fileDownload', 'true', time() + 60, '/');
 
-            echo $response;
+            //echo $response;
             unlink($xlsx_filename);
             exit;
         } else {
             $OUTPUT->notification('message', get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');
 
             // Fallback: disponibiliza o xlsx original se a conversão falhar
-            readfile($xlsx_filename);
+            //readfile($xlsx_filename);
         }
     } else {
         // Log do erro para diagnóstico
@@ -400,7 +400,7 @@ if (is_null($course_duration)) {
         $SESSION->gradeoverview_error = get_string('servidor_nao_encontrado', 'block_exportgradesigaa');
         redirect(new moodle_url('/course/view.php', ['id' => $courseid]));
 
-        readfile($xlsx_filename);
+        //readfile($xlsx_filename);
     }
 
     // Limpeza

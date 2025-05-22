@@ -85,36 +85,6 @@ function get_category_id_by_name($category_prefix, $courseid)
     return null; // Retorna null se não encontrar a categoria
 }
 
-// Função para obter o ID do item de nota com base no nome da atividade da Quarta Prova
-function get_item_id_by_activity_name_Quarta_Prova($activity_prefix, $courseid)
-{
-    global $DB;
-
-    // Remove espaços em branco no início e no final do prefixo
-    $activity_prefix = trim($activity_prefix);
-
-    // Busca todos os itens de nota do curso
-    $items = $DB->get_records('grade_items', ['courseid' => $courseid, 'itemtype' => 'mod']);
-
-    foreach ($items as $item) {
-        // Remove espaços em branco no início e no final do nome da atividade
-        $item_name = trim($item->itemname);
-
-        // Verifica se o nome da atividade começa com o prefixo desejado (case-insensitive)
-        if (stripos($item_name, $activity_prefix) === 0) {
-            // Verifica se o prefixo corresponde exatamente ao início do nome da atividade
-            $prefix_length = strlen($activity_prefix);
-            $next_char = substr($item_name, $prefix_length, 1); // Pega o próximo caractere após o prefixo
-
-            // Se o próximo caractere for um hífen, espaço ou o final da string, considera como correspondência válida
-            if ($next_char === '-' || $next_char === ' ' || $next_char === '') {
-                return $item->id; // Retorna o ID do item de nota encontrado
-            }
-        }
-    }
-    return null; // Retorna null se não encontrar o item
-}
-
 // Função para obter o ID do item de nota com base no ID da categoria
 function get_item_id_by_category($category_id, $courseid)
 {
@@ -205,8 +175,8 @@ if (is_null($course_duration)) {
 } else {
 
     //Envia para o servidor de conversão
-    $conversion_server = ''; // endpoint do servidor
-    $secret = ''; // mesma chave do servidor
+    $conversion_server = 'http://localhost:8080/'; // endpoint do servidor
+    $secret = 'segredo123'; // mesma chave do servidor
 
     if (check_conversion_server($conversion_server, $secret)) {
         //Colocar a pesquisa da turma recursiva, T2...T3...T4...T5
@@ -265,9 +235,6 @@ if (is_null($course_duration)) {
         }
         $row++;
 
-        // Obter o ID do item de nota da "Quarta Prova"
-        $quarta_prova_item_id = get_item_id_by_activity_name_Quarta_Prova('Quarta Prova', $courseid);
-
         // Dados dos alunos
         $students = get_role_users($DB->get_record("role", ['shortname' => 'student'])->id, $context);
 
@@ -290,13 +257,13 @@ if (is_null($course_duration)) {
         $unit1_category_id = get_category_id_by_name('Unidade 1', $courseid);
         $unit2_category_id = get_category_id_by_name('Unidade 2', $courseid);
         $unit3_category_id = ($num_unidades == 3) ? get_category_id_by_name('Unidade 3', $courseid) : null;
-        //$rec_category_id = get_category_id_by_name('Recuperação', $courseid); // Busca a categoria da recuperação
+        $rec_category_id = get_category_id_by_name('Exame Final', $courseid); // Busca a categoria da recuperação
 
         // Passo 2: Obter o ID do item de nota
         $unit1_item_id = get_item_id_by_category($unit1_category_id, $courseid);
         $unit2_item_id = get_item_id_by_category($unit2_category_id, $courseid);
         $unit3_item_id = get_item_id_by_category($unit3_category_id, $courseid);
-        //$rec_item_id = get_item_id_by_category($rec_category_id, $courseid); // Busca o item da recuperação
+        $rec_item_id = get_item_id_by_category($rec_category_id, $courseid); // Busca o item da recuperação
 
         //Pegar a REC, se existir
         //Sobre as Unidades, a carga horária <= 45 é de 2 Unidades. Maior que > 45, é de 3 Unidades.
@@ -314,8 +281,7 @@ if (is_null($course_duration)) {
             $grade1 = get_student_grade($student->id, $unit1_item_id);
             $grade2 = get_student_grade($student->id, $unit2_item_id);
             $grade3 = get_student_grade($student->id, $unit3_item_id);
-            //$rec_grade = get_student_grade($student->id, $rec_item_id); // Nota da recuperação
-            $quarta_prova_grade = get_student_grade($student->id, $quarta_prova_item_id); // Nota da Quarta Prova
+            $rec_grade = get_student_grade($student->id, $rec_item_id); // Nota da recuperação
 
             // Adiciona os dados do aluno à planilha
             $data = [
@@ -325,7 +291,7 @@ if (is_null($course_duration)) {
                 $grade1, //grade1
                 $grade2, //grade2
                 $grade3, //grade3
-                $quarta_prova_grade, //Recuperação
+                $rec_grade, //Recuperação
                 '', //$result_formula,
                 0,  // Número de faltas padrão
                 '', //$status_formula,

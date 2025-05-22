@@ -16,7 +16,7 @@ $string['ch_nao_definida'] = 'Erro: A carga horária (CH) da turma não foi defi
 $string['matricula_nao_encontrada'] = 'Erro: A turma possui alunos com dados incompletos. Entre em contato com o suporte.';
 $string['notas_nao_encontradas'] = 'Erro: Nenhuma nota foi encontrada para o aluno.';
 
-$string['servidor_nao_encontrado'] = 'Erro: O servidor está inoperante. Entre em contato com o suporte.';
+$string['servidor_nao_encontrado'] = 'Erro: O serviço está inoperante. Entre em contato com o suporte.';
 $string['erro_geral'] = 'Error: An unexpected error occurred. Please contact the administrator.';
 
 $string['aguarde_download'] = 'Aguarde enquanto o arquivo está sendo gerado.';

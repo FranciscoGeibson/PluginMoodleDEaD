@@ -408,9 +408,9 @@ if (is_null($course_duration)) {
 
 
         // Se o servidor de conversão não estiver operacional, disponibiliza o xlsx original
-        header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
-        header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
-        readfile($xlsx_filename);
+        //header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+        //header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
+        //readfile($xlsx_filename);
     }
 
     // Limpeza

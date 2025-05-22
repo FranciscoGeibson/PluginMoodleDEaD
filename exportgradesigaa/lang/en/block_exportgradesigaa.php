@@ -4,13 +4,13 @@ $string['pluginname'] = 'Grades for SIGAA';
 $string['download_xls'] = 'Download Grades Spreadsheet';
 $string['view_tutorial'] = 'View Usage Tutorial';
 
-$string['planilha_notas'] = 'GRADES SPREADSHEET';
-$string['instrucao1'] = 'To submit grades to SIGAA, follow the steps below or see the tutorial at dead.uern.br/notasparasigaa:';
-$string['instrucao2'] = 'SIGAA only accepts uploads in the .xls file format.';
-$string['instrucao3'] = 'With this spreadsheet open in Microsoft Excel or LibreOffice Calc, click "File" and then "Save As".';
-$string['instrucao4'] = 'Select the .xls format from the available options and save the file.';
-$string['instrucao5'] = 'Open the grade entry screen in the SIGAA Virtual Class and click the "Import Spreadsheet" button.';
-$string['instrucao6'] = 'Click the "Choose File" button, select the .xls spreadsheet, and click "Import".';
+$string['planilha_notas'] = 'PLANILHA DE NOTAS';
+$string['instrucao1'] = 'Para inserir as notas no SIGAA, siga os passos ou veja o tutorial em dead.uern.br/notasparasigaa:';
+$string['instrucao2'] = 'ATENÇÃO:';
+$string['instrucao3'] = 'Não altere nenhuma irformação deste arquivo';
+$string['instrucao4'] = 'Todos os dados abaixos estão formatados para serem importados diretamente no SIGAA.';
+$string['instrucao5'] = 'Qualquer alteração pode causar erro na importação.';
+$string['instrucao6'] = 'As colunas "Resultado", "Faltas" e "Sit." em branco não influienciam na importação.';
 
 $string['ch_nao_definida'] = 'Error: The course workload (CH) has not been defined.';
 $string['matricula_nao_encontrada'] = 'Error: The student enrollment was not found.';

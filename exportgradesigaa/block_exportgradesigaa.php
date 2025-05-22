@@ -36,7 +36,7 @@ class block_exportgradesigaa extends block_base
         // Exibe notificação de erro, se existir
         if (!empty($SESSION->gradeoverview_error)) {
             $this->content->text .= $OUTPUT->notification($SESSION->gradeoverview_error, get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');
-            
+
             unset($SESSION->gradeoverview_error);
         }
 
@@ -45,23 +45,23 @@ class block_exportgradesigaa extends block_base
 
         // Botões de download e mensagens de sucesso e info
         $this->content->text .= html_writer::div(
-            html_writer::link($url, get_string('download_xls', 'block_gradeoverview'), [
-                'class' => 'btn btn-primary',
-                'id' => 'download-xls-button',
-                'data-url' => $url
-            ]) .
-            html_writer::div(get_string('aguarde_download', 'block_gradeoverview'), 'alert alert-info', [
+            html_writer::div(get_string('aguarde_download', 'block_exportgradesigaa'), 'alert alert-info', [
                 'id' => 'info-message',
                 'style' => 'display:none; margin-top:10px;'
             ]) .
-            html_writer::div(get_string('download_sucesso', 'block_gradeoverview'), 'alert alert-success', [
+            html_writer::div(get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
                 'id' => 'success-message',
                 'style' => 'display:none; margin-top:10px;'
+            ]) .
+            html_writer::link($url, get_string('download_xls', 'block_exportgradesigaa'), [
+                'class' => 'btn btn-primary',
+                'id' => 'download-xls-button',
+                'data-url' => $url
             ]),
             '',
             ['style' => 'margin-bottom: 10px;']
         );
-        
+
         // Link para o tutorial
         $this->content->text .= html_writer::div(
             html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'))

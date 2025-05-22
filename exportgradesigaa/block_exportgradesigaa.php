@@ -45,11 +45,11 @@ class block_exportgradesigaa extends block_base
 
         // Botões de download e mensagens de sucesso e info
         $this->content->text .= html_writer::div(
-            html_writer::div(get_string('aguarde_download', 'block_exportgradesigaa'), 'alert alert-info', [
+            html_writer::div($OUTPUT->pix_icon('i/loading_small', 'loading', 'moodle') . get_string('aguarde_download', 'block_exportgradesigaa'), 'alert alert-info', [
                 'id' => 'info-message',
                 'style' => 'display:none; margin-top:10px;'
             ]) .
-                html_writer::div(get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
+                html_writer::div($OUTPUT->pix_icon('i/grade_correct', 'tick', 'moodle') . get_string('download_sucesso', 'block_exportgradesigaa'), 'alert alert-success', [
                     'id' => 'success-message',
                     'style' => 'display:none; margin-top:10px;'
                 ]),
@@ -58,7 +58,7 @@ class block_exportgradesigaa extends block_base
         );
 
         
-        $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'Edit me', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'margin-top: 20px; font-weight: bold;']);
+        $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'warning', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'margin-top: 20px; font-weight: bold;']);
         $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", ['style' => "margin-bottom: 20px;"]);
 
 

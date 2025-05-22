@@ -359,10 +359,6 @@ if (is_null($course_duration)) {
         $writer = new Xlsx($spreadsheet);
         $writer->save($xlsx_filename);
 
-        $cfile = new CURLFile($xlsx_filename, 'application/vnd.oasis.opendocument.spreadsheet', basename($xlsx_filename));
-
-        $dados = ['xlsx_file' => $cfile];
-
         // Primeiro verifica se o servidor está operacional
         $cfile = new CURLFile($xlsx_filename, 'application/vnd.oasis.opendocument.spreadsheet', basename($xlsx_filename));
         $dados = ['xlsx_file' => $cfile];
@@ -396,8 +392,6 @@ if (is_null($course_duration)) {
             $OUTPUT->notification('message', get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');
 
             // Fallback: disponibiliza o xlsx original se a conversão falhar
-            header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
-            header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
             readfile($xlsx_filename);
         }
     } else {
@@ -406,11 +400,7 @@ if (is_null($course_duration)) {
         $SESSION->gradeoverview_error = get_string('servidor_nao_encontrado', 'block_exportgradesigaa');
         redirect(new moodle_url('/course/view.php', ['id' => $courseid]));
 
-
-        // Se o servidor de conversão não estiver operacional, disponibiliza o xlsx original
-        //header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
-        //header('Content-Disposition: attachment; filename="' . $xlsx_filename . '"');
-        //readfile($xlsx_filename);
+        readfile($xlsx_filename);
     }
 
     // Limpeza

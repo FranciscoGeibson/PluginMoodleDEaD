@@ -68,7 +68,8 @@ class block_exportgradesigaa extends block_base
             html_writer::link('https://dead.uern.br/notasparasigaa', get_string('view_tutorial', 'block_exportgradesigaa'), array('class' => 'btn btn-secondary'))
         );
         
-        $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", ['style' => 'margin-top: 20px;']);
+        $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'Edit me', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'margin-top: 20px; font-weight: bold;']);
+        $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", []);
 
 
 

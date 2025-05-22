@@ -30,7 +30,7 @@ function check_conversion_server($server_url, $secret)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-    
+
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
@@ -385,22 +385,15 @@ if (is_null($course_duration)) {
             // Define o cookie para indicar que o download foi iniciado
             setcookie('fileDownload', 'true', time() + 60, '/');
 
-            //echo $response;
-            unlink($xlsx_filename);
+            echo $response;
             exit;
         } else {
             $OUTPUT->notification('message', get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');
-
-            // Fallback: disponibiliza o xlsx original se a conversão falhar
-            //readfile($xlsx_filename);
         }
     } else {
         // Log do erro para diagnóstico
-        //error_log("Servidor de conversão indisponível");
         $SESSION->gradeoverview_error = get_string('servidor_nao_encontrado', 'block_exportgradesigaa');
         redirect(new moodle_url('/course/view.php', ['id' => $courseid]));
-
-        //readfile($xlsx_filename);
     }
 
     // Limpeza

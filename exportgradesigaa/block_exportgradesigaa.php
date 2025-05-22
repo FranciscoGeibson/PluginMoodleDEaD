@@ -68,7 +68,7 @@ class block_exportgradesigaa extends block_base
         $this->content->text .= html_writer::end_tag("button");
         $this->content->text .= html_writer::end_tag("a");
 
-        $this->content->text .= html_writer::start_tag("a",['href' => 'https://dead.uern.br/notasparasigaa']);
+        $this->content->text .= html_writer::start_tag("a",['href' => 'https://dead.uern.br/notasparasigaa', 'target' => '_blank']);
         $this->content->text .= html_writer::start_tag("button",['class' => 'btn btn-secondary','id' => 'tutorial-xls-button', 'style' => 'margin-bottom: 10px;']);
         $this->content->text .= get_string('view_tutorial', 'block_exportgradesigaa');
         $this->content->text .= html_writer::end_tag("button");

@@ -352,6 +352,7 @@ if (is_null($course_duration)) {
             setcookie('fileDownload', 'true', time() + 60, '/');
 
             echo $response;
+            unlink($xlsx_filename);
             exit;
         } else {
             $OUTPUT->notification('message', get_string('servidor_nao_encontrado', 'block_exportgradesigaa'), 'error');

@@ -58,7 +58,7 @@ class block_exportgradesigaa extends block_base
         );
 
         
-        $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'warning', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'margin-top: 20px; font-weight: bold;']);
+        $this->content->text .= html_writer::div($OUTPUT->pix_icon('i/warning', 'warning', 'moodle') . "ATENÇÃO", "gradessigaawarning", ['style' => 'font-weight: bold;']);
         $this->content->text .= html_writer::div(get_string('alerta_beta', 'block_exportgradesigaa'), "gradessigaawarning", ['style' => "margin-bottom: 20px;"]);
 
 
